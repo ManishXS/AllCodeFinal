@@ -39,7 +39,8 @@ namespace BackEnd.Controllers
                 {
                     userId = newUser.Id,
                     username = newUser.Username,
-                    profilePic = newUser.ProfilePicUrl
+                    profilePic = newUser.ProfilePicUrl,
+                    createdAt = newUser.CreatedAt
                 });
             }
             catch (CosmosException ex)
