@@ -89,10 +89,6 @@ namespace BackEnd
             {
                 logger.LogInformation("Starting Configure...");
 
-                // Set up port for Azure
-                var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-                app.UseUrls($"http://*:{port}");
-                logger.LogInformation($"Listening on port {port}.");
 
                 if (env.IsDevelopment())
                 {

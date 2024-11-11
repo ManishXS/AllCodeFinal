@@ -1,28 +1,23 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+
 namespace BackEnd
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            try
-            {
-                CreateHostBuilder(args).Build().Run();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            CreateHostBuilder(args).Build().Run();
         }
+
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    // Set the port here
+                    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+                    webBuilder.UseUrls($"http://*:{port}");
                     webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.AddConsole(); 
                 });
     }
 }
