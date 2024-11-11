@@ -1,4 +1,4 @@
-namespace BackEnd
+namespace BackEnd.Controllers
 {
     public class WeatherForecast
     {
