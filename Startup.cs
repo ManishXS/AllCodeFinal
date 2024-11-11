@@ -1,5 +1,5 @@
-﻿using Azure.Storage.Blobs;
-using Azure.Identity;
+﻿using Azure.Identity;
+using Azure.Storage.Blobs;
 using BackEnd.Entities;
 using Microsoft.Azure.Cosmos;
 
@@ -19,7 +19,6 @@ namespace BackEnd
             try
             {
                 var keyVaultEndpoint = new Uri("https://tenxk.vault.azure.net/");
-
                 var updatedConfiguration = new ConfigurationBuilder()
                     .AddConfiguration(_configuration)
                     .AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential())
@@ -28,13 +27,10 @@ namespace BackEnd
                 var cosmosDbConnectionString = updatedConfiguration["CosmosDbConnectionString"];
                 var blobConnectionString = updatedConfiguration["BlobConnectionString"];
                 var apiKey = updatedConfiguration["ApiKey1"];
-                var serviceBusConnectionString = "a";//updatedConfiguration["ServiceBusConnectionString"];
 
-                if (string.IsNullOrEmpty(cosmosDbConnectionString) ||
-                    string.IsNullOrEmpty(blobConnectionString) ||
-                    string.IsNullOrEmpty(serviceBusConnectionString))
+                if (string.IsNullOrEmpty(cosmosDbConnectionString) || string.IsNullOrEmpty(blobConnectionString) || string.IsNullOrEmpty(apiKey))
                 {
-                    throw new Exception("Connection strings are missing.");
+                    throw new Exception("Connection strings or API key are missing.");
                 }
 
                 CosmosClientOptions clientOptions = new CosmosClientOptions
@@ -44,11 +40,15 @@ namespace BackEnd
                     MaxTcpConnectionsPerEndpoint = 10
                 };
 
+
                 CosmosClient cosmosClient = new CosmosClient(cosmosDbConnectionString, clientOptions);
                 services.AddSingleton(cosmosClient);
                 services.AddScoped<CosmosDbContext>();
 
+
                 services.AddSingleton(x => new BlobServiceClient(blobConnectionString));
+
+                services.AddSingleton<IConfiguration>(updatedConfiguration);
 
                 services.AddControllers();
                 services.AddSwaggerGen();
@@ -71,8 +71,10 @@ namespace BackEnd
 
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseAuthorization();
 
+            app.UseMiddleware<ApiKeyMiddleware>();
+
+            app.UseAuthorization();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
