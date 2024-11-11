@@ -18,20 +18,25 @@ namespace BackEnd
         {
             try
             {
+
                 var keyVaultEndpoint = new Uri("https://tenxk.vault.azure.net/");
                 var updatedConfiguration = new ConfigurationBuilder()
                     .AddConfiguration(_configuration)
                     .AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential())
                     .Build();
 
+
                 var cosmosDbConnectionString = updatedConfiguration["CosmosDbConnectionString"];
                 var blobConnectionString = updatedConfiguration["BlobConnectionString"];
-                var apiKey = updatedConfiguration["ApiKey1"];
+                var apiKey = updatedConfiguration["ApiKey1"]; 
 
-                if (string.IsNullOrEmpty(cosmosDbConnectionString) || string.IsNullOrEmpty(blobConnectionString) || string.IsNullOrEmpty(apiKey))
+                if (string.IsNullOrEmpty(cosmosDbConnectionString) ||
+                    string.IsNullOrEmpty(blobConnectionString) ||
+                    string.IsNullOrEmpty(apiKey))
                 {
                     throw new Exception("Connection strings or API key are missing.");
                 }
+
 
                 CosmosClientOptions clientOptions = new CosmosClientOptions
                 {
@@ -40,7 +45,6 @@ namespace BackEnd
                     MaxTcpConnectionsPerEndpoint = 10
                 };
 
-
                 CosmosClient cosmosClient = new CosmosClient(cosmosDbConnectionString, clientOptions);
                 services.AddSingleton(cosmosClient);
                 services.AddScoped<CosmosDbContext>();
@@ -48,7 +52,19 @@ namespace BackEnd
 
                 services.AddSingleton(x => new BlobServiceClient(blobConnectionString));
 
+
                 services.AddSingleton<IConfiguration>(updatedConfiguration);
+
+
+                services.AddCors(options =>
+                {
+                    options.AddPolicy("AllowAll", builder =>
+                    {
+                        builder.AllowAnyOrigin()       
+                               .AllowAnyHeader()       
+                               .AllowAnyMethod();      
+                    });
+                });
 
                 services.AddControllers();
                 services.AddSwaggerGen();
@@ -71,6 +87,8 @@ namespace BackEnd
 
             app.UseHttpsRedirection();
             app.UseRouting();
+
+            app.UseCors("AllowAll");
 
             app.UseMiddleware<ApiKeyMiddleware>();
 

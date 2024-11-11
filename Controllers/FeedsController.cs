@@ -90,10 +90,6 @@ namespace BackEnd.Controllers
                     var continuationToken = response.ContinuationToken;
                 }
 
-                foreach (var feed in feeds)
-                {
-                    feed.FeedUrl = MaskBlobUrl(feed.FeedUrl);
-                }
 
                 return Ok(feeds);
             }
@@ -103,10 +99,6 @@ namespace BackEnd.Controllers
             }
         }
 
-        private string MaskBlobUrl(string blobUrl)
-        {
-            Uri uri = new Uri(blobUrl);
-            return $"{uri.Scheme}://{uri.Host}/media/{uri.AbsolutePath.Split('/').Last()}";
-        }
+
     }
 }
