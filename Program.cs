@@ -14,10 +14,9 @@ namespace BackEnd
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    // Set the port here
-                    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-                    webBuilder.UseUrls($"http://*:{port}");
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls("http://0.0.0.0:8080");  
                 });
+
     }
 }
