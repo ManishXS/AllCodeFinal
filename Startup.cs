@@ -22,7 +22,7 @@ namespace BackEnd
                 Console.WriteLine("Starting ConfigureServices...");
 
                 // Key Vault configuration
-                var keyVaultEndpoint = new Uri("https://tenxk.vault.azure.net/");
+                var keyVaultEndpoint = new Uri("https://firstenxkv.vault.azure.net/");
                 var updatedConfiguration = new ConfigurationBuilder()
                     .AddConfiguration(_configuration)
                     .AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential())
@@ -33,7 +33,7 @@ namespace BackEnd
                 // Retrieve secrets
                 var cosmosDbConnectionString = updatedConfiguration["CosmosDbConnectionString"];
                 var blobConnectionString = updatedConfiguration["BlobConnectionString"];
-                var apiKey = updatedConfiguration["ApiKey1"];
+                var apiKey = updatedConfiguration["ApiKey"];
 
                 if (string.IsNullOrEmpty(cosmosDbConnectionString) || string.IsNullOrEmpty(blobConnectionString) || string.IsNullOrEmpty(apiKey))
                 {
